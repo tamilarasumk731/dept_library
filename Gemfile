@@ -18,6 +18,7 @@ gem 'dotenv-rails'
 gem 'bcrypt', '~> 3.1', '>= 3.1.12'
 gem 'rails_admin', '~> 1.3'
 gem 'pry'
+gem 'valid_email'
 
 # Use ActiveStorage variant
 # gem 'mini_magick', '~> 4.8'
