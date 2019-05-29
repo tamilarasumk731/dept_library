@@ -11,4 +11,6 @@ class User < ApplicationRecord
   validates :staff_id,  presence: true
   validates :status, presence: true
   validates :password, length: {minimum: 8, allow_blank: true}, presence: true
+
+  
 end
