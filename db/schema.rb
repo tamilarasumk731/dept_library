@@ -10,16 +10,44 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_28_160759) do
+ActiveRecord::Schema.define(version: 2019_06_01_123545) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "authors", force: :cascade do |t|
+    t.string "author_name"
+    t.integer "book_count"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "book_authors", force: :cascade do |t|
+    t.bigint "book_id"
+    t.bigint "author_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["author_id"], name: "index_book_authors_on_author_id"
+    t.index ["book_id"], name: "index_book_authors_on_book_id"
+  end
+
+  create_table "books", force: :cascade do |t|
+    t.string "assess_no"
+    t.string "isbn"
+    t.string "book_name"
+    t.integer "availability"
+    t.integer "cupboard_no"
+    t.integer "shelf_no"
+    t.float "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "name", null: false
     t.integer "staff_id", null: false
     t.string "email", null: false
-    t.integer "role", default: 0, null: false
+    t.integer "role", default: 3, null: false
     t.integer "desig", default: 0, null: false
     t.string "password_digest", null: false
     t.integer "status", default: 0, null: false

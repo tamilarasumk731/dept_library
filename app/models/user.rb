@@ -10,7 +10,6 @@ class User < ApplicationRecord
   validates :desig,  presence: true
   validates :staff_id,  presence: true
   validates :status, presence: true
-  validates :password, length: {minimum: 8, allow_blank: true}, presence: true
-
+  validates :password, length: {minimum: 8, allow_blank: true}, presence: true, allow_nil: true
   
 end
