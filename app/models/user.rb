@@ -8,7 +8,7 @@ class User < ApplicationRecord
   validates :email, presence: true, email: {mx_with_fallback: true}, length: {maximum:100,                      allow_blank: true},  uniqueness: {case_sensitive: false, allow_blank: true}
   validates :role,  presence: true
   validates :desig,  presence: true
-  validates :staff_id,  presence: true
+  validates :staff_id,  presence: true, uniqueness: true
   validates :status, presence: true
   validates :password, length: {minimum: 8, allow_blank: true}, presence: true, allow_nil: true
   
