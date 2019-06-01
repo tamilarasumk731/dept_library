@@ -6,6 +6,7 @@ module Api
 
       def signup    
         user = User.new(auth_params)
+        user.status = "Approved"
         if  user.save
           render json:{ success: true, message: "Signup successful"}, status: :ok and return
         else
@@ -13,19 +14,49 @@ module Api
         end
       end
 
-      def login
+      def hod_login
         user = User.find_by(staff_id: auth_params[:staff_id])
-        if  user && user.authenticate(auth_params[:password])
+        if  user && user.authenticate(auth_params[:password]) && (user.role == "HoD") && (user.status == "Approved")
           token = Token.encode(user.id)
-          render json: { token: token, message: 'logged in successfully', staff_id: user.staff_id }
+          render json: {success: true, token: token, message: 'logged in successfully' }
         else
-          render json: { message: 'authentication failed' }, status: :bad_request and return
+          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+        end
+      end
+
+      def librarian_login
+        user = User.find_by(staff_id: auth_params[:staff_id])
+        if  user && user.authenticate(auth_params[:password]) && (user.role == "Librarian") && (user.status == "Approved")
+          token = Token.encode(user.id)
+          render json: {success: true, token: token, message: 'logged in successfully' }
+        else
+          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+        end
+      end
+
+      def incharge_login
+        user = User.find_by(staff_id: auth_params[:staff_id])
+        if  user && user.authenticate(auth_params[:password]) && (user.role == "Incharge") && (user.status == "Approved")
+          token = Token.encode(user.id)
+          render json: {success: true, token: token, message: 'logged in successfully' }
+        else
+          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+        end
+      end
+
+      def staff_login
+        user = User.find_by(staff_id: auth_params[:staff_id])
+        if  user && user.authenticate(auth_params[:password]) && (user.role == "HoD" || user.role == "Staff") && (user.status == "Approved")
+          token = Token.encode(user.id)
+          render json: {success: true, token: token, message: 'logged in successfully' }
+        else
+          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
         end
       end
 
       private
       def auth_params
-        params.require(:auth).permit(:staff_id, :name, :email, :role, :desig, :password)
+        params.require(:auth).permit(:staff_id, :name, :email, :desig, :password)
       end
 
     end

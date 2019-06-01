@@ -10,6 +10,10 @@ module Api
           render json: { status: false, messages: @user.errors.full_messages.to_sentence }, status: :unprocessable_entity and return
         end
       end
+      
+      def approve_staff
+        
+      end
 
       private
 
