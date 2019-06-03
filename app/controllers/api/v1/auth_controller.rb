@@ -3,7 +3,7 @@ module Api
     class AuthController < BaseController
 
       skip_before_action :requires_login
-      skip_before_action :set_current_user
+      skip_before_action :set_current_user, :except => [:reset_password]
 
       def signup    
         user = User.new(auth_params)
@@ -52,6 +52,26 @@ module Api
           render json: {success: true, token: token, message: 'logged in successfully' }
         else
           render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+        end
+      end
+
+      def forgot_password
+        user = User.find_by(staff_id: params[:staff_id])
+        if  user && (user.status == "Approved")
+          token = Token.encode(user.id)
+          UserMailer.forgot_password(user, token).deliver_later
+          render json: {success: true, message: 'Reset link sent' }
+        else
+          render json: {success: false, message: 'Staff not found' }, status: :not_found and return
+        end
+      end
+
+      def reset_password
+        begin
+          @current_user.update(password: params[:password])
+          render json: {success: true, message: "Password reset success."}
+        rescue => e
+          render json: {success: false, message: e.message.split(': ')[1]}, status: :unprocessable_entity and return
         end
       end
 

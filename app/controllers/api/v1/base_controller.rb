@@ -11,7 +11,7 @@ module Api
       
       def requires_login
         return if current_user_present?
-        render json: { meta: {status: false, msg: 'No logged in user'} }, status: 401
+        render json: { meta: {success: false, msg: 'No logged in user'} }, status: 401
       end
 
       def current_user_present?

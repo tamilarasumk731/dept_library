@@ -10,6 +10,8 @@ Rails.application.routes.draw do
           post '/login/librarian', to: "auth#librarian_login"
           post '/login/incharge', to: "auth#incharge_login"
           post '/login/staff', to: "auth#staff_login"
+          get  '/password/forgot', to: "auth#forgot_password"
+          post '/password/reset', to: "auth#reset_password"
         end
       end
       resources :books, only: [:index] do
