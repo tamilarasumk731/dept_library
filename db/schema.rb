@@ -9,22 +9,22 @@
 # you'll amass, the slower it'll run and the greater likelihood for issues).
 #
 # It's strongly recommended that you check this file into your version control system.
-
-ActiveRecord::Schema.define(version: 2019_06_01_123545) do
+ActiveRecord::Schema.define(version: 2019_06_02_073348) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "authors", force: :cascade do |t|
-    t.string "author_name"
-    t.integer "book_count"
+    t.string "author_name", null: false
+    t.integer "book_count", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["author_name"], name: "index_authors_on_author_name"
   end
 
   create_table "book_authors", force: :cascade do |t|
-    t.bigint "book_id"
-    t.bigint "author_id"
+    t.bigint "book_id", null: false
+    t.bigint "author_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["author_id"], name: "index_book_authors_on_author_id"
@@ -32,15 +32,18 @@ ActiveRecord::Schema.define(version: 2019_06_01_123545) do
   end
 
   create_table "books", force: :cascade do |t|
-    t.string "assess_no"
-    t.string "isbn"
-    t.string "book_name"
-    t.integer "availability"
-    t.integer "cupboard_no"
-    t.integer "shelf_no"
-    t.float "price"
+    t.string "assess_no", null: false
+    t.string "isbn", null: false
+    t.string "book_name", null: false
+    t.integer "availability", null: false
+    t.integer "cupboard_no", null: false
+    t.integer "shelf_no", null: false
+    t.float "price", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["assess_no"], name: "index_books_on_assess_no", unique: true
+    t.index ["book_name"], name: "index_books_on_book_name"
+    t.index ["isbn"], name: "index_books_on_isbn"
   end
 
   create_table "users", force: :cascade do |t|

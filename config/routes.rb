@@ -12,6 +12,11 @@ Rails.application.routes.draw do
           post '/login/staff', to: "auth#staff_login"
         end
       end
+      resources :books, only: [:index] do
+        collection do
+          post '/new', to: "books#create"
+        end
+      end
     end
   end
 
