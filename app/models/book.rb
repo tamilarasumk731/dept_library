@@ -1,7 +1,7 @@
 class Book < ApplicationRecord
 	enum availability: {'Ordered' => 0, 'Available' => 1, 'Issued' => 2, 'Damaged' => 3, 'Withdrawn' => 4, 'Requested' => 1, 'Lost' => 2}
 	has_many :book_authors
-  has_many :authors, through: :book_authors 
+  has_many :authors, through: :book_authors, dependent: :destroy
 
   validates :assess_no,  presence: true, uniqueness: true
   validates :isbn,  presence: true

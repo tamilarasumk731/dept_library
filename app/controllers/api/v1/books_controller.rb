@@ -21,6 +21,30 @@ module Api
         end
       end
 
+      def update
+        
+      end
+
+      def delete
+        book = Book.find_by(assess_no: delete_params[:assess_no])
+        if book.present?
+          delete_author_record book[:id]
+          book.destroy
+          render json: {success: true, message: "Deleted Book: Assess_no - #{book[:assess_no]}, Name - #{book[:book_name]}", book: book} and return
+        else
+          render json: {success: false, message: "Assess no: #{book[:assess_no]} not Found"} and return
+        end
+      end
+
+      def delete_author_record book_id
+        author_ids = BookAuthor.where(book_id: book_id)
+        binding.pry
+        author_ids.each do |author_id| 
+          author = Author.find(author_id[:author_id])
+          Author.update_author_with_respect_to_book author 
+        end
+      end
+
       def create_new_record 
         @book = Book.new(book_params)
         unless author_params[:author_name].present?
@@ -58,6 +82,10 @@ module Api
 
       def search_params
         params.require(:book).permit(:book_name)
+      end
+
+      def delete_params
+        params.require(:book).permit(:assess_no)
       end
     end
   end

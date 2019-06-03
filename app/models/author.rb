@@ -1,6 +1,6 @@
 class Author < ApplicationRecord
 	has_many :book_authors
-  has_many :books, through: :book_authors
+  has_many :books, through: :book_authors, dependent: :destroy
 
   validates :author_name,  presence: true
   validates :book_count,  presence: true
@@ -48,6 +48,10 @@ class Author < ApplicationRecord
 
   def self.update_author_table_to_previous_state author_name
   	author = Author.find_by(author_name: author_name)
+  	update_author_with_respect_to_book author
+  end
+
+  def self.update_author_with_respect_to_book author
   	if author[:book_count] == 1
   		author.destroy
   	else
