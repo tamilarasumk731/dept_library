@@ -39,4 +39,20 @@ class Author < ApplicationRecord
   	end
   end
 
+  def self.rollback_author author_records
+  	author_data = author_records[:author_name]
+  	author_data.each do |author_name|
+	  	update_author_table_to_previous_state author_name
+	  end
+  end
+
+  def self.update_author_table_to_previous_state author_name
+  	author = Author.find_by(author_name: author_name)
+  	if author[:book_count] == 1
+  		author.destroy
+  	else
+  		author.update(book_count: author[:book_count] - 1)
+  	end
+  end
+
 end
