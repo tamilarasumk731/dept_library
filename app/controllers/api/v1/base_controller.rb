@@ -20,12 +20,12 @@ module Api
 
       def set_current_user
         begin
-          token = request.headers['Authorization'].to_s[6..-1]
+          token = request.headers['Authorization'].to_s
           return unless token
           payload = Token.new(token)
           @current_user = User.find(payload.user_id) if payload.valid?
         rescue Exception => e
-          return render json: { error: e.message }, status: :unprocessable_entity
+          return render json: {success: false, error: e.message }, status: :unprocessable_entity
         end
       end
     end

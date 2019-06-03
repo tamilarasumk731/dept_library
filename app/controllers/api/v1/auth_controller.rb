@@ -3,6 +3,7 @@ module Api
     class AuthController < BaseController
 
       skip_before_action :requires_login
+      skip_before_action :set_current_user
 
       def signup    
         user = User.new(auth_params)
