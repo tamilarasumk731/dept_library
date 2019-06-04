@@ -16,7 +16,7 @@ Rails.application.routes.draw do
         collection do
           post '/new', to: "books#create"
           post '/search', to: "books#search"
-          post '/delete', to: "books#delete"
+          delete '/delete', to: "books#delete"
         end
       end
     end
