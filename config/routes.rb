@@ -17,6 +17,8 @@ Rails.application.routes.draw do
       resources :books, only: [:index] do
         collection do
           post '/new', to: "books#create"
+          post '/search', to: "books#search"
+          delete '/delete', to: "books#delete"
         end
       end
     end
