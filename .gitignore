@@ -24,3 +24,4 @@
 
 .env.development
 .env.production
+config/environments/development.rb
