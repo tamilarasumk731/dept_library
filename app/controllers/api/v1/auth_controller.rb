@@ -59,7 +59,7 @@ module Api
         user = User.find_by(staff_id: params[:staff_id])
         if  user && (user.status == "Approved")
           token = Token.encode(user.id)
-          UserMailer.forgot_password(user, token).deliver_later!
+          UserMailer.forgot_password(user, token).deliver_now!
           render json: {success: true, message: 'Reset link sent' }
         else
           render json: {success: false, message: 'Staff not found' }, status: :not_found and return
