@@ -9,6 +9,6 @@ class UserMailer < ApplicationMailer
 
   def staff_approval(user)
     @user = user
-    mail(to: @user.email, subject: ENV['APPROVAL_SUB'])
+    mail(from: 'Department Library <mathsdeptlibrary@gmail.com>', to: @user.email, subject: ENV['APPROVAL_SUB'])
   end
 end
