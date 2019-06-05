@@ -21,6 +21,16 @@ Rails.application.routes.draw do
           delete '/delete', to: "books#delete"
         end
       end
+      resources :users, only: [:index] do
+        collection do
+          get '/approve/staff', to: "users#approve_staff"
+          get '/assign/librarian', to: "users#assign_librarian"
+          get '/assign/incharge', to: "users#assign_incharge"
+          get '/remove/librarian', to: "users#remove_librarian"
+          get '/remove/incharge', to: "users#remove_incharge"
+          get 'remove/staff', to: "users#delete_staff"
+        end
+      end
     end
   end
 
