@@ -63,7 +63,7 @@ module Api
             UserMailer.forgot_password(user, token).deliver!
             render json: {success: true, message: 'Reset link sent' }
           rescue => e
-            render json: {success: false, message: e.message.split(': ')[1]}, status: :ok and return
+            render json: {success: false, message: e}, status: :ok and return
           end
         else
           render json: {success: false, message: 'Staff not found' }, status: :not_found and return

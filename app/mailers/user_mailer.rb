@@ -1,5 +1,5 @@
 class UserMailer < ApplicationMailer
-  default from: "maths@annauniv.edu"
+  default from: "mathsdeptlibrary@gamil.com"
 
   def forgot_password(user,token)
     @user = user
