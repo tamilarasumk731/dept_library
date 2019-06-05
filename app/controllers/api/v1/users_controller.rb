@@ -2,8 +2,6 @@ module Api
   module V1
     class UsersController < BaseController
 
-      before_action :requires_login, :except => [:create]
-
       def create
         @user = User.new(user_params)
         unless @user.save 
@@ -12,14 +10,23 @@ module Api
       end
       
       def approve_staff
+        if @current_user.role == "Librarian"
+          @staff = User.find_by(staff_id: params(:staff_id))
+          @staff.update(status: "Approved")
+          render json: {success: true, message: "Staff approved"}, status: :ok and return
+        else
+          render json: {success: false, message: "Unauthorized access"}, status: :unauthorized_access and return
+        end
         
       end
 
       private
 
       def user_params
-        params.require(:user).permit(:staff_id, :name, :email, :role, :desig, :password)
+        params.require(:staff).permit(:staff_id, :name, :email, :role, :desig, :password)
       end
+
+
 
     end
   end
