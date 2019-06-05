@@ -7,7 +7,6 @@ module Api
 
       def signup    
         user = User.new(auth_params)
-        user.status = "Approved"
         if  user.save
           render json:{ success: true, message: "Signup successful"}, status: :ok and return
         else
@@ -60,7 +59,7 @@ module Api
         if  user && (user.status == "Approved")
           token = Token.encode(user.id)
           begin
-            UserMailer.forgot_password(user, token).deliver!
+            UserMailer.forgot_password(user, token).deliver_now!
             render json: {success: true, message: 'Reset link sent' }
           rescue => e
             render json: {success: false, message: e}, status: :ok and return
