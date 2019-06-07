@@ -109,6 +109,7 @@ module Api
       def decline_staff
         if @current_user.role == "Librarian"
           @user = User.find_by(staff_id: params[:staff_id])
+          render json: {success: false, message: "Staff already approved"}, status: :ok and return if @user.status == "Approved"
           if @user
             @user.destroy
             UserMailer.staff_declined(@user).deliver_now!
