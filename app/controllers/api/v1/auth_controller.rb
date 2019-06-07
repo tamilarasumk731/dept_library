@@ -46,7 +46,7 @@ module Api
 
       def staff_login
         user = User.find_by(staff_id: auth_params[:staff_id])
-        if  user && user.authenticate(auth_params[:password]) && (user.role == "HoD" || user.role == "Staff") && (user.status == "Approved")
+        if  user && user.authenticate(auth_params[:password]) && (user.status == "Approved")
           token = Token.encode(user.id)
           render json: {success: true, token: token, message: 'logged in successfully' }
         else
