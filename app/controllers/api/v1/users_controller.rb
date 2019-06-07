@@ -96,10 +96,35 @@ module Api
         end
       end
 
+      def update_profile
+        begin
+          @current_user.update(name: user_params[:name], email: user_params[:email], desig: user_params[:desig], password: user_params[:password])
+          UserMailer.profile_update(@current_user).deliver_now!
+          render json: {success: true, message: "Profile updated successfully"}, status: :ok and return
+        rescue => e
+          render json: {success: false, message: e.message.split(': ')[1]}, status: :ok and return
+        end
+      end
+
+      def decline_staff
+        if @current_user.role == "Librarian"
+          @user = User.find_by(staff_id: params[:staff_id])
+          if @user
+            @user.destroy
+            UserMailer.staff_declined(@user).deliver_now!
+            render json: {success: true, message: "Staff declined success"}, status: :ok and return
+          else
+            render json: {success: false, message: "Staff not found"}, status: :ok and return
+          end
+        else
+          render json: {success: false, message: "Unauthorized access"}, status: :ok and return
+        end
+      end
+
       private
 
       def user_params
-        params.require(:staff).permit(:staff_id, :name, :email, :role, :desig, :password)
+        params.require(:staff).permit( :name, :email, :desig, :password)
       end
 
     end

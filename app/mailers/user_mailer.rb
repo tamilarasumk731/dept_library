@@ -11,4 +11,14 @@ class UserMailer < ApplicationMailer
     @user = user
     mail(from: 'Department Library <mathsdeptlibrary@gmail.com>', to: @user.email, subject: ENV['APPROVAL_SUB'])
   end
+
+  def staff_declined(user)
+    @user = user
+    mail(from: 'Department Library <mathsdeptlibrary@gmail.com>', to: @user.email, subject: ENV['DECLINE_SUB'])
+  end
+
+  def profile_update(user)
+    @user = user
+    mail(from: 'Department Library <mathsdeptlibrary@gmail.com>', to: @user.email, subject: ENV['UPDATE_SUB'])
+  end
 end
