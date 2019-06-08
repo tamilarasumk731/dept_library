@@ -3,39 +3,79 @@ module Api
     class BooksController < BaseController
       before_action :set_current_user, :except => [:index]
       before_action :requires_login, :except => [:index]
+      before_action :check_role_for_authorization, :except => [:index]
 
       def create
-        if @current_user.role == "Librarian"
-          create_new_record
+        book = Book.new(book_params)
+        if book.valid?
+          authors = update_author_if_needed author_params
+          create_new_record book_params, authors
         else
-          render json: {success: false, message: "Unauthorized access"}, status: :ok and return
+          render json: {success: false, message: book.errors.full_messages.to_sentence} and return
+        end
+      end
+
+      def update_author_if_needed author_params
+        if author_params.present? && author_params[:author_name].present?
+          all_authors = Array.new
+          author_params[:author_name].each do |author|
+            all_authors << Author.find_or_create_by(author_name: author)
+          end
+          all_authors
+        else
+          render json: {success: false, message: "Author name should not be empty"} and return
+        end
+      end
+
+      def create_new_record book_params, authors
+        if authors.present?
+          Book.create(book_params.merge(authors: authors))
+          render json:{ success: true, message: "Book Added successful"}, status: :ok and return
+        else
+          render json: {success: false, message: "Author is not created"} and return
         end
       end
 
       def search
-        if @current_user.status == "Approved"
-          @page = params[:page] || 1
-          @books = Book.where('lower(book_name) LIKE ?', "%#{search_params[:book_name].downcase}%").page(@page).per(20)
-          render json: {success: false, message: "Book Name not Found"} and return if !@books.present?
-        end
+        @page = params[:page] || 1
+        @books = Book.where('lower(book_name) LIKE ?', "%#{search_params[:book_name].downcase}%").page(@page).per(20)
+        render json: {success: false, message: "Book Name not Found"} and return if !@books.present?
       end
 
       def update
-        
+        book = Book.where(id: book_params[:id]).first
+        if book.present?
+          if author_params.present?
+            authors = update_author_if_needed author_params
+            update_book book, authors
+          else  
+            update_book book
+          end
+        else
+          render json: {success: false, message: "Book is empty for the Book Id: #{params[:id]}"} and return
+        end
+      end
+
+      def update_book actual_book, authors = []
+        book_update_params = book_params.to_h
+        is_valid = Book.check_for_valid_params actual_book, book_params.to_h
+        if is_valid.keys.blank?
+          book_update_params = book_update_params.merge(authors: authors) if authors.present?
+          book = actual_book.update(book_update_params)
+          render json: {success: true, message: "Book updated successfully", book: book_update_params} and return
+        else
+          render json: {success: false, message: is_valid} and return
+        end
       end
 
       def delete
-        if @current_user.role == "Librarian"
-          @book = Book.find_by(access_no: delete_params[:access_no])
-          if @book.present?
-            delete_author_record @book[:id]
-            @book.destroy
-            render json: {success: true, message: "Deleted Book: Access_no - #{@book[:access_no]}, Name - #{@book[:book_name]}", book: @book} and return
-          else
-            render json: {success: false, message: "Access no: #{delete_params[:access_no]} not Found"}, status: :not_found and return
-          end
+        book = Book.find(book_params[:id])
+        if book.present?
+          book.authors.destroy_all
+          book.destroy
+          render json: {success: true, message: "Book Id: #{book_params[:id]} removed successfully"}, status: :ok and return
         else
-          render json: {success: false, message: "Unauthorized access"}, status: :ok and return
+          render json: {success: false, message: "Book Id: #{book_params[:id]} not Found"}, status: :not_found and return
         end
       end
       
@@ -46,36 +86,8 @@ module Api
 
       private
 
-      def delete_author_record book_id
-        author_ids = BookAuthor.where(book_id: book_id)
-        author_ids.each do |author_id| 
-          author = Author.find(author_id[:author_id])
-          Author.update_author_with_respect_to_book author 
-        end
-      end
-
-      def create_new_record 
-        @book = Book.new(book_params)
-        unless author_params[:author_name].present?
-          render json: {success: false, message: "Author for the Book is Empty"} and return
-        end
-        author_ids = lookup_author
-        if  @book.save
-          BookAuthor.update_book_author_list @book[:id], author_ids
-          render json:{ success: true, message: "Book Added successful"}, status: :ok and return
-        else
-          Author.rollback_author author_params
-          render json: {success: false, message: @book.errors.full_messages.to_sentence} and return
-        end
-      end
-
-      def lookup_author
-        author_ids = Author.search_existing_authors_list author_params
-        return author_ids
-      end
-
       def book_params
-        params.require(:book).permit(:access_no, :isbn, :book_name, :availability, :cupboard_no, :shelf_no, :price)
+        params.require(:book).permit(:id, :access_no, :isbn, :book_name, :availability, :cupboard_no, :shelf_no, :price)
       end
 
       def author_params
@@ -86,9 +98,6 @@ module Api
         params.require(:book).permit(:book_name)
       end
 
-      def delete_params
-        params.require(:book).permit(:access_no)
-      end
     end
   end
 end
