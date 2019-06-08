@@ -49,7 +49,7 @@ ActiveRecord::Schema.define(version: 2019_06_08_190116) do
   create_table "transactions", force: :cascade do |t|
     t.bigint "book_id", null: false
     t.bigint "user_id", null: false
-    t.boolean "type", default: true
+    t.boolean "status", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["book_id"], name: "index_transactions_on_book_id"

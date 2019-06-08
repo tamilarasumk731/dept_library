@@ -10,7 +10,7 @@ module Api
         if  user.save
           render json:{ success: true, message: "Signup successful"}, status: :ok and return
         else
-          render json: {success: false, message: user.errors.full_messages.to_sentence}
+          render json: {success: false, message: user.errors.full_messages.to_sentence}, status: :ok and return
         end
       end
 

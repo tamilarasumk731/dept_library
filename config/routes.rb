@@ -34,8 +34,14 @@ Rails.application.routes.draw do
           put '/update/staff',      to: "users#update_profile"
         end
       end
+
+      resources :transactions, only: [] do
+        collection do
+          post '/borrow', to: "transactions#borrow"
+          post '/return', to: "transactions#return"
+        end
+      end
+
     end
   end
-
-
 end
