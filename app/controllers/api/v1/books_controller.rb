@@ -4,6 +4,7 @@ module Api
       before_action :set_current_user, :except => [:index]
       before_action :requires_login, :except => [:index]
       before_action :check_role_for_authorization, :except => [:index]
+      before_action :type_cast_if_needed, :only => [:create, :update]
 
       def create
         book = Book.new(book_params)
@@ -30,7 +31,7 @@ module Api
       def create_new_record book_params, authors
         if authors.present?
           Book.create(book_params.merge(authors: authors))
-          render json:{ success: true, message: "Book Added successful"}, status: :ok and return
+          render json:{ success: true, message: "Book Added successful", book: book_params.merge(author_params)}, status: :ok and return
         else
           render json: {success: false, message: "Author is not created"} and return
         end
@@ -60,9 +61,13 @@ module Api
         book_update_params = book_params.to_h
         is_valid = Book.check_for_valid_params actual_book, book_params.to_h
         if is_valid.keys.blank?
-          book_update_params = book_update_params.merge(authors: authors) if authors.present?
-          book = actual_book.update(book_update_params)
-          render json: {success: true, message: "Book updated successfully", book: book_update_params} and return
+          begin
+            book_update_params = book_update_params.merge(authors: authors) if authors.present?
+            book = actual_book.update(book_update_params)
+            render json: {success: true, message: "Book updated successfully", book: book_update_params} and return
+          rescue => e
+            render json: {success: false, message: e.message.split(': ')[1]}, status: :ok and return
+          end
         else
           render json: {success: false, message: is_valid} and return
         end
@@ -98,6 +103,11 @@ module Api
         params.require(:book).permit(:book_name)
       end
 
+      def type_cast_if_needed
+        params[:book][:availability] = params[:book][:availability].to_i
+        params[:book][:cupboard_no] = params[:book][:cupboard_no].to_i
+        params[:book][:shelf_no] = params[:book][:shelf_no].to_i
+      end
     end
   end
 end

@@ -17,13 +17,19 @@ class Book < ApplicationRecord
     status = Book.new(book_params)
     if !status.valid?
       errors = status.errors.to_h
-      errors.except!(:access_no) if remove_accessno_unique_error_if_needed errors, actual_book, book_params
+      if remove_accessno_unique_error_if_needed errors, actual_book, book_params
+        errors.except(:access_no)
+      else
+        errors
+      end
     end
   end
 
   def self.remove_accessno_unique_error_if_needed errors, actual_book, book_params
     if actual_book[:access_no] == book_params[:access_no] && errors[:access_no] == "has already been taken"
       true
+    else
+      false
     end
   end
 
