@@ -1,4 +1,8 @@
 class User < ApplicationRecord
+
+  has_many :transactions
+  has_many :books, through: :transactions
+
   has_secure_password
   enum role: {'HoD' => 0, 'Librarian' => 1, 'Incharge' => 2, 'Staff' => 3}
   enum desig: {'Professor' => 0, 'Associate Professor' => 1, 'Assistant Professor' => 2, 'Teaching Fellow' => 3, 'Professional Assistant' => 4}

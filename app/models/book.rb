@@ -4,6 +4,8 @@ class Book < ApplicationRecord
 
   has_many :book_authors
   has_many :authors, through: :book_authors
+  has_many  :transactions
+  has_many  :users, through: :transactions
 
   validates :access_no,  presence: true, uniqueness: true
   validates :isbn,  presence: true, length: {maximum: 13}
