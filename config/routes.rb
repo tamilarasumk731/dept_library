@@ -19,7 +19,7 @@ Rails.application.routes.draw do
           post '/new',      to: "books#create"
           post '/search',   to: "books#search"
           delete '/delete', to: "books#delete"
-          post '/edit', to: "books#update"
+          put '/edit', to: "books#update"
         end
       end
       resources :users, only: [:index] do
