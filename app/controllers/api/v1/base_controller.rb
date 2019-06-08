@@ -18,6 +18,14 @@ module Api
         current_user.present?
       end
 
+      def check_role_for_authorization
+        if @current_user.role == "Librarian"
+          true
+        else
+          render json: {success: false, message: "Unauthorized access"}, status: :ok and return
+        end
+      end
+
       def set_current_user
         begin
           token = request.headers['Authorization'].to_s
