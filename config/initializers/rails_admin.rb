@@ -29,6 +29,8 @@ RailsAdmin.config do |config|
       (name == ENV['RAILS_ADMIN'] && password == ENV['RAILS_ADMIN_PASSWORD'])
     end
   end
+
+  config.included_models = ["Author", "Book", "BookAuthor", "Transaction", "User"].sort_by! { |m| m }
   
   config.actions do
     dashboard                     # mandatory
