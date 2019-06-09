@@ -4,6 +4,7 @@ module Api
       before_action :set_current_user, :except => [:index]
       before_action :requires_login, :except => [:index]
       before_action :check_role_for_authorization, :except => [:specific_issued_list, :specific_returned_list]
+      before_action :all_role_authorization, :only => [:issued_list, :returned_list]
       before_action :set_staff, :except => [:return_book]
       before_action :set_book, :only => [:issue_book, :return_book]
       before_action :check_transaction, :only => [:issue_book]
