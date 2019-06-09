@@ -37,8 +37,8 @@ Rails.application.routes.draw do
 
       resources :transactions, only: [] do
         collection do
-          post '/borrow', to: "transactions#borrow"
-          post '/return', to: "transactions#return"
+          post '/issue', to: "transactions#issue_book"
+          post '/return', to: "transactions#return_book"
         end
       end
 

@@ -4,20 +4,20 @@ module Api
       before_action :set_current_user, :except => [:index]
       before_action :requires_login, :except => [:index]
       before_action :check_role_for_authorization
-      before_action :set_staff
-      before_action :set_book, :except => [:borrowed_list, :returned_list]
-      before_action :check_transaction, :only => [:borrow]
+      before_action :set_staff, 
+      before_action :set_book, :except => [:issued_list, :returned_list]
+      before_action :check_transaction, :only => [:issue_book]
    
-      def borrow
+      def issue_book
         @transaction = Transaction.new(user_id: @staff.id, book_id: @book.id)
         if @transaction.save
-          render json: {success: true, message: "Book borrowed successfully"}, status: :ok and return
+          render json: {success: true, message: "Book issued successfully"}, status: :ok and return
         else
           render json: {success: false, message: user.errors.full_messages.to_sentence}, status: :ok and return
         end
       end
 
-      def return
+      def return_book
         @transaction = Transaction.where(user_id: @staff.id, book_id: @book.id, status: true)[0]
         if @transaction.present?
           @transaction.update(status: false)
@@ -27,23 +27,51 @@ module Api
         end
       end
 
-      def borrowed_list
-        @page = params[:page] || 1
-        book_ids = @staff.transactions.where(status: false).map(&:book_id).uniq
-        @books = Book.where(id: book_ids).page(@page).per(20)
+      def issued_list
+        sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.user_id = #{@staff.id} AND transactions.status = true"
+        books = ActiveRecord::Base.connection.execute(sql).to_a
+        books.each do |h|
+          h.store('due_date',h.delete('created_at'))
+          h["due_date"] = (h["due_date"].to_date + 180.day).to_s
+        end
+        render json: {success: true, transaction: books}, status: :ok and return
       end
 
       def returned_list
-        @page = params[:page] || 1
-        book_ids = @staff.transactions.where(status: true).map(&:book_id).uniq
-        @books = Book.where(id: book_ids).page(@page).per(20)
+        sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.user_id = #{@staff.id} AND transactions.status = false"
+        books = ActiveRecord::Base.connection.execute(sql).to_a
+        books.each do |h|
+          h.store('due_date',h.delete('created_at'))
+          h["due_date"] = (h["due_date"].to_date + 180.day).to_s
+        end
+        render json: {success: true, transaction: books}, status: :ok and return
+      end
+
+      def specific_issued_list
+        sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.status = true"
+        books = ActiveRecord::Base.connection.execute(sql).to_a
+        books.each do |h|
+          h.store('due_date',h.delete('created_at'))
+          h["due_date"] = (h["due_date"].to_date + 180.day).to_s
+        end
+        render json: {success: true, transaction: books}, status: :ok and return
+      end
+
+      def specific_returned_list
+        sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.status = false"
+        books = ActiveRecord::Base.connection.execute(sql).to_a
+        books.each do |h|
+          h.store('due_date',h.delete('created_at'))
+          h["due_date"] = (h["due_date"].to_date + 180.day).to_s
+        end
+        render json: {success: true, transaction: books}, status: :ok and return
       end
     
 
       private
 
       def set_staff
-        staff_id = transaction_params[:staff_id] || params[:staff_id]
+        staff_id = params[:staff_id] || @current_user.staff_id
         @staff = User.find_by(staff_id: staff_id)
         if @staff == nil
           render json: {success: false, message: "Staff not found"}, status: :ok and return
@@ -60,7 +88,7 @@ module Api
       def check_transaction
         @transaction = Transaction.where(book_id: @book.id)[-1]
         if @transaction.status == true
-          render json: {success: false, message: "Book already borrowed by #{@transaction.user.name}"}
+          render json: {success: false, message: "Book already issued to #{@transaction.user.name}"}
         end
       end
 
