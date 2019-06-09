@@ -4,7 +4,7 @@ module Api
       before_action :set_current_user, :except => [:index]
       before_action :requires_login, :except => [:index]
       before_action :check_role_for_authorization
-      before_action :set_staff
+      before_action :set_staff, :except => [:return]
       before_action :set_book, :except => [:borrowed_list, :returned_list]
       before_action :check_transaction, :only => [:borrow]
    
@@ -18,7 +18,7 @@ module Api
       end
 
       def return
-        @transaction = Transaction.where(user_id: @staff.id, book_id: @book.id, status: true)[0]
+        @transaction = Transaction.where(book_id: @book.id, status: true)[0]
         if @transaction.present?
           @transaction.update(status: false)
           render json: {success: true, message: "Book returned successfully"}, status: :ok and return
