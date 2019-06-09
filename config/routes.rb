@@ -37,8 +37,12 @@ Rails.application.routes.draw do
 
       resources :transactions, only: [] do
         collection do
-          post '/borrow', to: "transactions#borrow"
-          post '/return', to: "transactions#return"
+          get '/issue',               to: "transactions#issue_book"
+          get '/return',              to: "transactions#return_book"
+          get '/staff/returned_list', to: "transactions#specific_returned_list"
+          get '/staff/issued_list',   to: "transactions#specific_issued_list"
+          get '/issued_list',         to: "transactions#issued_list"
+          get '/returned_list',       to: "transactions#returned_list"
         end
       end
 
