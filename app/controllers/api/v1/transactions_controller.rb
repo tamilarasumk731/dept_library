@@ -58,9 +58,9 @@ module Api
       end
 
       def check_transaction
-        @transaction = Transaction.where(user_id: @staff.id, book_id: @book.id)[-1]
+        @transaction = Transaction.where(book_id: @book.id)[-1]
         if @transaction.status == true
-          render json: {success: false, message: "Book already borrowed by #{@staff.name}"}
+          render json: {success: false, message: "Book already borrowed by #{@transaction.user.name}"}
         end
       end
 
