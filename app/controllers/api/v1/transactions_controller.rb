@@ -3,9 +3,9 @@ module Api
     class TransactionsController < BaseController
       before_action :set_current_user, :except => [:index]
       before_action :requires_login, :except => [:index]
-      before_action :check_role_for_authorization
-      before_action :set_staff, 
-      before_action :set_book, :except => [:issued_list, :returned_list]
+      before_action :check_role_for_authorization, :except => [:specific_issued_list, :specific_returned_list]
+      before_action :set_staff, :except => [:return]
+      before_action :set_book, :only => [:issue_book, :return_book]
       before_action :check_transaction, :only => [:issue_book]
    
       def issue_book
@@ -18,16 +18,16 @@ module Api
       end
 
       def return_book
-        @transaction = Transaction.where(user_id: @staff.id, book_id: @book.id, status: true)[0]
+        @transaction = Transaction.where(book_id: @book.id, status: true)[0]
         if @transaction.present?
           @transaction.update(status: false)
           render json: {success: true, message: "Book returned successfully"}, status: :ok and return
         else
-          render json: {success: true, message: "Transaction not found"}, status: :ok and return
+          render json: {success: false, message: "Transaction not found"}, status: :ok and return
         end
       end
 
-      def issued_list
+      def specific_issued_list
         sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.user_id = #{@staff.id} AND transactions.status = true"
         books = ActiveRecord::Base.connection.execute(sql).to_a
         books.each do |h|
@@ -37,7 +37,7 @@ module Api
         render json: {success: true, transaction: books}, status: :ok and return
       end
 
-      def returned_list
+      def specific_returned_list
         sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.user_id = #{@staff.id} AND transactions.status = false"
         books = ActiveRecord::Base.connection.execute(sql).to_a
         books.each do |h|
@@ -47,7 +47,8 @@ module Api
         render json: {success: true, transaction: books}, status: :ok and return
       end
 
-      def specific_issued_list
+      def issued_list
+
         sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.status = true"
         books = ActiveRecord::Base.connection.execute(sql).to_a
         books.each do |h|
@@ -57,7 +58,7 @@ module Api
         render json: {success: true, transaction: books}, status: :ok and return
       end
 
-      def specific_returned_list
+      def returned_list
         sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.status = false"
         books = ActiveRecord::Base.connection.execute(sql).to_a
         books.each do |h|
@@ -79,7 +80,7 @@ module Api
       end
 
       def set_book
-        @book = Book.find_by(access_no: transaction_params[:access_no])
+        @book = Book.find_by(access_no: params[:access_no])
         if @book == nil
           render json: {success: false, message: "Book not found"}, status: :ok and return
         end
@@ -87,14 +88,11 @@ module Api
 
       def check_transaction
         @transaction = Transaction.where(book_id: @book.id)[-1]
-        if @transaction.status == true
-          render json: {success: false, message: "Book already issued to #{@transaction.user.name}"}
+        if @transaction && @transaction.status == true
+          render json: {success: false, message: "Book already borrowed by #{@transaction.user.name}"}, status: :ok and return
         end
       end
 
-      def transaction_params
-        params.require(:transaction).permit(:staff_id, :access_no)
-      end
     end
   end
 end
