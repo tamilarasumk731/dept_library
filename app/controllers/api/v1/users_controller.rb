@@ -98,7 +98,7 @@ module Api
 
       def update_profile
         begin
-          @current_user.update(name: user_params[:name], email: user_params[:email], desig: user_params[:desig], password: user_params[:password])
+          @current_user.update(user_params)
           UserMailer.profile_update(@current_user).deliver_now!
           render json: {success: true, message: "Profile updated successfully"}, status: :ok and return
         rescue => e
@@ -125,7 +125,7 @@ module Api
       private
 
       def user_params
-        params.require(:staff).permit( :name, :email, :desig, :password)
+        params.require(:staff).permit( :name, :email, :desig, :salutation, :intercom, :password)
       end
 
     end
