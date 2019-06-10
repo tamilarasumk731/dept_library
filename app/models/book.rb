@@ -8,7 +8,6 @@ class Book < ApplicationRecord
   has_many  :users, through: :transactions
 
   validates :access_no,  presence: true, uniqueness: true
-  validates :isbn,  presence: true, length: {maximum: 13}
   validates :book_name,  presence: true
   validates :availability,  presence: true
   validates :cupboard_no,  presence: true

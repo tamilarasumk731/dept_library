@@ -80,7 +80,7 @@ module Api
 
       private
       def auth_params
-        params.require(:auth).permit(:staff_id, :name, :email, :desig, :password)
+        params.require(:auth).permit(:staff_id, :name, :email, :desig, :password, :salutation, :intercom)
       end
 
     end
