@@ -35,7 +35,7 @@ module Api
           h.store('due_date',h.delete('created_at'))
           h["due_date"] = (h["due_date"].to_date + 180.day).to_s
         end
-        render json: {success: true, transaction: books}, status: :ok and return
+        render json: {success: true, count: books.count, books: books}, status: :ok and return
       end
 
       def specific_returned_list
@@ -45,7 +45,7 @@ module Api
           h.store('due_date',h.delete('created_at'))
           h["due_date"] = (h["due_date"].to_date + 180.day).to_s
         end
-        render json: {success: true, transaction: books}, status: :ok and return
+        render json: {success: true, count: books.count, books: books}, status: :ok and return
       end
 
       def issued_list
@@ -56,7 +56,7 @@ module Api
           h.store('due_date',h.delete('created_at'))
           h["due_date"] = (h["due_date"].to_date + 180.day).to_s
         end
-        render json: {success: true, transaction: books}, status: :ok and return
+        render json: {success: true, count: books.count, books: books}, status: :ok and return
       end
 
       def returned_list
@@ -66,7 +66,7 @@ module Api
           h.store('due_date',h.delete('created_at'))
           h["due_date"] = (h["due_date"].to_date + 180.day).to_s
         end
-        render json: {success: true, transaction: books}, status: :ok and return
+        render json: {success: true, count: books.count, books: books}, status: :ok and return
       end
     
 

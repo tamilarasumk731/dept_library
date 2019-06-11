@@ -74,13 +74,13 @@ module Api
       end
 
       def index
-        @page = params[:page] || 1
+        # @page = params[:page] || 1
         if @current_user.role == "HoD"
-          @users = User.where.not(role: 0).page(@page).per(20)
+          @users = User.where.not(role: 0)
         elsif @current_user.role == "Librarian"
-          @users = User.where.not(role: 1).page(@page).per(20)
+          @users = User.where.not(role: 1)
         elsif @current_user.role == "Incharge"
-          @users = User.where.not(role: 2).page(@page).per(20)
+          @users = User.where.not(role: 2)
         else
           render json: {success: false, message: "Unauthorized access"}, status: :ok and return
         end
