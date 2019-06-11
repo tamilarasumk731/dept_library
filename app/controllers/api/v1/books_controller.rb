@@ -38,8 +38,8 @@ module Api
       end
 
       def search
-        @page = params[:page] || 1
-        @books = Book.where('lower(book_name) LIKE ?', "%#{search_params[:book_name].downcase}%").page(@page).per(20)
+        # @page = params[:page] || 1
+        @books = Book.where('lower(book_name) LIKE ?', "%#{search_params[:book_name].downcase}%")
         render json: {success: false, message: "Book Name not Found"} and return if !@books.present?
       end
 
@@ -85,8 +85,8 @@ module Api
       end
       
       def index
-        @page = params[:page] || 1
-        @books = Book.all.page(@page).per(20)
+        # @page = params[:page] || 1
+        @books = Book.all
       end
 
       private
