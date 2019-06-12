@@ -31,7 +31,8 @@ Rails.application.routes.draw do
           get  '/remove/incharge',  to: "users#remove_incharge"
           get  '/remove/staff',     to: "users#delete_staff"
           get  '/decline/staff',    to: "users#decline_staff"
-          put '/update/staff',      to: "users#update_profile"
+          put  '/update/staff',     to: "users#update_profile"
+          get  '/profile',          to: "users#user_info"
         end
       end
 

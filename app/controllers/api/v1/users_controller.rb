@@ -122,6 +122,10 @@ module Api
         end
       end
 
+      def user_info
+        @current_user
+      end
+
       private
 
       def user_params
