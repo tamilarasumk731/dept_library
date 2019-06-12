@@ -4,3 +4,5 @@ json.staff_id user.staff_id
 json.email user.email
 json.desig user.desig
 json.role user.role
+json.intercom user.intercom
+json.salutation user.salutation
