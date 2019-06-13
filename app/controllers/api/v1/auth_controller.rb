@@ -18,6 +18,10 @@ module Api
         @user = User.find_by(staff_id: auth_params[:staff_id])
         if  @user && @user.authenticate(auth_params[:password]) && (@user.role == "HoD") && (@user.status == "Approved")
           @token = Token.encode(@user.id)
+          @staff_count = User.count
+          @book_count = Book.count
+          @issued_book_count = issued_book_count
+          @new_book_count = new_book_count
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
           render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
@@ -28,6 +32,9 @@ module Api
         @user = User.find_by(staff_id: auth_params[:staff_id])
         if  @user && @user.authenticate(auth_params[:password]) && (@user.role == "Librarian") && (@user.status == "Approved")
           @token = Token.encode(@user.id)
+          @staff_count = User.count
+          @book_count = Book.count
+          @issued_book_count = issued_book_count
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
           render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
@@ -37,7 +44,9 @@ module Api
       def incharge_login
         @user = User.find_by(staff_id: auth_params[:staff_id])
         if @user && @user.authenticate(auth_params[:password]) && (@user.role == "Incharge") && (@user.status == "Approved")
-          @token = Token.encode(user.id)
+          @token = Token.encode(@user.id)
+          @book_count = Book.count
+          @issued_book_count = issued_book_count
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
           render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
@@ -48,6 +57,7 @@ module Api
         @user = User.find_by(staff_id: auth_params[:staff_id])
         if  @user && @user.authenticate(auth_params[:password]) && (@user.status == "Approved")
           @token = Token.encode(@user.id)
+          @borrowed_book_count = borrowed_book_count @user
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
           render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
@@ -81,6 +91,18 @@ module Api
       private
       def auth_params
         params.require(:auth).permit(:staff_id, :name, :email, :desig, :password, :salutation, :intercom)
+      end
+
+      def issued_book_count
+        Transaction.where(status: "Approved").count
+      end
+
+      def new_book_count
+        Book.where.not(id: Transaction.all.map(&:book_id).uniq).count
+      end
+
+      def borrowed_book_count user
+        Transaction.where(user_id: user.id).count
       end
 
     end
