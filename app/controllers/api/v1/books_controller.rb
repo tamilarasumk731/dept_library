@@ -44,7 +44,7 @@ module Api
       end
 
       def update
-        book = Book.where(id: book_params[:id]).first
+        book = Book.find_by(access_no: book_params[:access_no])
         if book.present?
           if author_params.present?
             authors = update_author_if_needed author_params
@@ -53,7 +53,7 @@ module Api
             update_book book
           end
         else
-          render json: {success: false, message: "Book is empty for the Book Id: #{params[:id]}"} and return
+          render json: {success: false, message: "Book is empty for the Access_no: #{book_params[:access_no]}"} and return
         end
       end
 
@@ -74,13 +74,13 @@ module Api
       end
 
       def delete
-        book = Book.find(book_params[:id])
+        book = Book.find(book_params[:access_no])
         if book.present?
           book.authors.destroy_all
           book.destroy
-          render json: {success: true, message: "Book Id: #{book_params[:id]} removed successfully"}, status: :ok and return
+          render json: {success: true, message: "Access No: #{book_params[:access_no]} removed successfully"}, status: :ok and return
         else
-          render json: {success: false, message: "Book Id: #{book_params[:id]} not Found"}, status: :not_found and return
+          render json: {success: false, message: "Access No: #{book_params[:access_no]} not Found"}, status: :not_found and return
         end
       end
       
