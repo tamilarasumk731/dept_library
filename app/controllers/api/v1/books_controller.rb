@@ -74,7 +74,7 @@ module Api
       end
 
       def delete
-        book = Book.find(book_params[:access_no])
+        book = Book.find_by(access_no: book_params[:access_no])
         if book.present?
           book.authors.destroy_all
           book.destroy
