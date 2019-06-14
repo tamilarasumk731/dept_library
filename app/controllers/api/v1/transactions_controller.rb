@@ -9,10 +9,10 @@ module Api
       before_action :set_book, :only => [:issue_book, :return_book]
       before_action :check_transaction, :only => [:issue_book]
    
-      def issue_book && book_status
+      def issue_book
         @transaction = Transaction.new(user_id: @staff.id, book_id: @book.id)
-        @book.update(availability: "Issued")
-        if @transaction.save
+        if book_status && @transaction.save
+          @book.update(availability: "Issued")
           render json: {success: true, message: "Book issued successfully"}, status: :ok and return
         else
           render json: {success: false, message: user.errors.full_messages.to_sentence}, status: :ok and return
