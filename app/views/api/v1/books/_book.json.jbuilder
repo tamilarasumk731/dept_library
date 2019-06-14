@@ -6,4 +6,4 @@ json.cupboard_no book.cupboard_no
 json.shelf_no book.shelf_no
 json.price book.price
 json.authors book.authors.map(&:author_name)
-json.status book.availability
+json.availability book.availability
