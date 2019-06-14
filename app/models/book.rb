@@ -1,5 +1,5 @@
 class Book < ApplicationRecord
-	enum availability: {'Ordered' => 0, 'Available' => 1, 'Issued' => 2, 'Damaged' => 3, 'Withdrawn' => 4, 'Requested' => 1, 'Lost' => 2}
+	enum availability: {'Ordered' => 0, 'Available' => 1, 'Issued' => 2, 'Damaged' => 3, 'Withdrawn' => 4, 'Requested' => 5, 'Lost' => 6}
   # enum shelf_no: {'A' => 1, 'B' => 2, 'C' => 3, 'D' => 4, 'E' => 5}
 
   has_many :book_authors

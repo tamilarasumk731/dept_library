@@ -11,6 +11,7 @@ module Api
    
       def issue_book
         @transaction = Transaction.new(user_id: @staff.id, book_id: @book.id)
+        @book.update(availability: "Issued")
         if @transaction.save
           render json: {success: true, message: "Book issued successfully"}, status: :ok and return
         else
@@ -20,6 +21,7 @@ module Api
 
       def return_book
         @transaction = Transaction.where(book_id: @book.id, status: true)[0]
+        @book.update(availability: "Available")
         if @transaction.present?
           @transaction.update(status: false)
           render json: {success: true, message: "Book returned successfully"}, status: :ok and return
