@@ -8,21 +8,22 @@ module Api
       before_action :set_staff, :except => [:return_book]
       before_action :set_book, :only => [:issue_book, :return_book]
       before_action :check_transaction, :only => [:issue_book]
+      before_action :book_status, :only => [:issue_book]
    
       def issue_book
         @transaction = Transaction.new(user_id: @staff.id, book_id: @book.id)
-        if book_status && @transaction.save
+        if @transaction.save
           @book.update(availability: "Issued")
           render json: {success: true, message: "Book issued successfully"}, status: :ok and return
         else
-          render json: {success: false, message: user.errors.full_messages.to_sentence}, status: :ok and return
+          render json: {success: false, message: @transaction.errors.full_messages.to_sentence}, status: :ok and return
         end
       end
 
       def return_book
         @transaction = Transaction.where(book_id: @book.id, status: true)[0]
-        @book.update(availability: "Available")
         if @transaction.present?
+          @book.update(availability: "Available")
           @transaction.update(status: false)
           render json: {success: true, message: "Book returned successfully"}, status: :ok and return
         else
@@ -51,7 +52,6 @@ module Api
       end
 
       def issued_list
-
         sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.status = true"
         books = ActiveRecord::Base.connection.execute(sql).to_a
         books.each do |h|
@@ -97,7 +97,7 @@ module Api
       end
 
       def book_status
-        if @book.availability == "Available"
+        if @book.availability == "Available" 
           return true
         else
           render json: {success: false, message: "Book with Access_no #{@book.access_no} is #{@book.availability}"}, status: :ok and return
