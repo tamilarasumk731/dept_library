@@ -9,7 +9,7 @@ module Api
       before_action :set_book, :only => [:issue_book, :return_book]
       before_action :check_transaction, :only => [:issue_book]
    
-      def issue_book
+      def issue_book && book_status
         @transaction = Transaction.new(user_id: @staff.id, book_id: @book.id)
         @book.update(availability: "Issued")
         if @transaction.save
@@ -93,6 +93,14 @@ module Api
         @transaction = Transaction.where(book_id: @book.id)[-1]
         if @transaction && @transaction.status == true
           render json: {success: false, message: "Book already borrowed by #{@transaction.user.name}"}, status: :ok and return
+        end
+      end
+
+      def book_status
+        if @book.availability == "Available"
+          return true
+        else
+          render json: {success: false, message: "Book with Access_no #{@book.access_no} is #{@book.availability}"}, status: :ok and return
         end
       end
 
