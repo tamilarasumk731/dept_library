@@ -2,7 +2,6 @@ json.id book.id
 json.access_no book.access_no
 json.book_name book.book_name
 json.isbn book.isbn
-json.availability book.availability
 json.cupboard_no book.cupboard_no
 json.shelf_no book.shelf_no
 json.price book.price
