@@ -20,6 +20,7 @@ Rails.application.routes.draw do
           post '/search',   to: "books#search"
           delete '/delete', to: "books#delete"
           put '/edit',      to: "books#update"
+          post '/batch_create', to: "books#batch_create"
         end
       end
       resources :users, only: [:index] do
