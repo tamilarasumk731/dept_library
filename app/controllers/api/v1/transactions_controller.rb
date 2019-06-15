@@ -52,7 +52,7 @@ module Api
       end
 
       def issued_list
-        sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.status = true"
+        sql = "SELECT users.staff_id, books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id INNER JOIN users ON users.id = transactions.user_id WHERE transactions.status = true"
         books = ActiveRecord::Base.connection.execute(sql).to_a
         books.each do |h|
           h.store('due_date',h.delete('created_at'))
@@ -62,7 +62,7 @@ module Api
       end
 
       def returned_list
-        sql = "SELECT  books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id WHERE transactions.status = false"
+        sql = "SELECT users.staff_id, books.access_no, books.book_name, transactions.created_at FROM books INNER JOIN transactions ON books.id = transactions.book_id INNER JOIN users ON users.id = transactions.user_id WHERE transactions.status = false"
         books = ActiveRecord::Base.connection.execute(sql).to_a
         books.each do |h|
           h.store('due_date',h.delete('created_at'))
