@@ -3,7 +3,7 @@ module Api
     class AuthController < BaseController
 
       skip_before_action :requires_login
-      skip_before_action :set_current_user, :except => [:reset_password]
+      skip_before_action :set_current_user, :except => [:reset_password, :authorize_token]
 
       def signup    
         user = User.new(auth_params)
@@ -24,7 +24,7 @@ module Api
           @new_book_count = new_book_count
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
-          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+          render json: {success: false, message: 'authentication failed' }, status: :ok and return
         end
       end
 
@@ -37,7 +37,7 @@ module Api
           @issued_book_count = issued_book_count
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
-          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+          render json: {success: false, message: 'authentication failed' }, status: :ok and return
         end
       end
 
@@ -49,7 +49,7 @@ module Api
           @issued_book_count = issued_book_count
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
-          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+          render json: {success: false, message: 'authentication failed' }, status: :ok and return
         end
       end
 
@@ -60,7 +60,7 @@ module Api
           @borrowed_book_count = borrowed_book_count @user
           # render json: {success: true, token: token, message: 'logged in successfully' }
         else
-          render json: {success: false, message: 'authentication failed' }, status: :bad_request and return
+          render json: {success: false, message: 'authentication failed' }, status: :ok and return
         end
       end
 
@@ -75,7 +75,7 @@ module Api
             render json: {success: false, message: e}, status: :ok and return
           end
         else
-          render json: {success: false, message: 'Staff not found' }, status: :not_found and return
+          render json: {success: false, message: 'Staff not found' }, status: :ok and return
         end
       end
 
@@ -84,8 +84,12 @@ module Api
           @current_user.update(password: params[:password])
           render json: {success: true, message: "Password reset success."}
         rescue => e
-          render json: {success: false, message: e.message.split(': ')[1]}, status: :unprocessable_entity and return
+          render json: {success: false, message: e.message.split(': ')[1]}, status: :ok and return
         end
+      end
+
+      def authorize_token
+        render json: {success: true, message: "Valid Token", role: @current_user.role}, status: :ok  and return
       end
 
       private
