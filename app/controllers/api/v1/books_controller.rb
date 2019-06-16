@@ -1,9 +1,11 @@
 module Api
   module V1
     class BooksController < BaseController
-      before_action :set_current_user, :except => [:index]
-      before_action :requires_login, :except => [:index]
-      before_action :check_role_for_authorization, :except => [:index]
+      extend Api::V1::AuthorUtils
+
+      before_action :set_current_user, :except => [:index, :batch_create]
+      before_action :requires_login, :except => [:index, :batch_create]
+      before_action :check_role_for_authorization, :except => [:index, :batch_create]
       before_action :type_cast_if_needed, :only => [:create, :update]
 
       def create
@@ -13,18 +15,6 @@ module Api
           create_new_record book_params, authors
         else
           render json: {success: false, message: book.errors.full_messages.to_sentence} and return
-        end
-      end
-
-      def update_author_if_needed author_params
-        if author_params.present? && author_params[:author_name].present?
-          all_authors = Array.new
-          author_params[:author_name].each do |author|
-            all_authors << Author.find_or_create_by(author_name: author)
-          end
-          all_authors
-        else
-          render json: {success: false, message: "Author name should not be empty"} and return
         end
       end
 
@@ -89,6 +79,22 @@ module Api
         @books = Book.all
       end
 
+      def batch_create
+        filename = "book_#{Time.now.getutc.strftime('%Y%m%dT%H%M%SZ')}"
+        book_details = Array.new
+        CSV.open("storage/book_files/#{filename}", "wb") do |csv|
+          File.foreach(params["book"].tempfile) do |line|
+            book_details << [line.chomp]
+            csv << [line.chomp]
+          end
+        end
+        begin
+          parse_csv_file(book_details)
+        rescue => e
+          render json: {success: false, message: "Exception occured while processing bulk book upload - #{e.message}"} and return
+        end
+      end
+
       private
 
       def book_params
@@ -101,6 +107,45 @@ module Api
 
       def search_params
         params.require(:book).permit(:book_name)
+      end
+
+      def parse_csv_file(book_details)
+        raise "No records to process" if book_details.count <= 1
+        header_count = 0
+        book_records = Array.new
+        book_details.each_with_index do |row, i|
+          row = row[0].split(",")
+          if i == 0
+            header_count = row.count
+            next
+          end
+          if row.count != header_count
+            render json: {success: false, message: "Skipping Update due to mismatch with the header #{key}"} and return
+          end
+          book_records << prepare_record(row)
+          if book_records.size == 100
+            status = Book.process_records book_records
+            book_records = []
+          end
+        end
+        status = Book.process_records book_records if book_records.present?
+        if status == true
+          render json: {success: true, message: "Books uploaded successfully"}, status: :ok and return
+        else
+          render json: {success: true, message: "Books upload failed"}, status: :ok and return
+        end
+      end
+
+      def prepare_record(row)
+        record = {:access_no => row[0],
+                  :isbn => row[1],
+                  :book_name => row[2],
+                  :availability => row[3],
+                  :cupboard_no => row[4],
+                  :shelf_no => row[5],
+                  :price => row[6],
+                  :author => row[7],
+                }
       end
 
       def type_cast_if_needed
