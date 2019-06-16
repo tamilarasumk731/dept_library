@@ -11,7 +11,7 @@ module Api
       
       def requires_login
         return if current_user_present?
-        render json: { meta: {success: false, msg: 'No logged in user'} }, status: 401
+        render json: { meta: {success: false, msg: 'No logged in user'} }, status: :ok and return
       end
 
       def current_user_present?
@@ -41,7 +41,7 @@ module Api
           payload = Token.new(token)
           @current_user = User.find(payload.user_id) if payload.valid?
         rescue Exception => e
-          return render json: {success: false, error: e.message }, status: :unprocessable_entity
+          return render json: {success: false, error: e.message }, status: :ok
         end
       end
     end

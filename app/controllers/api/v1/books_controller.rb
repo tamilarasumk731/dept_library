@@ -71,7 +71,7 @@ module Api
           book.destroy
           render json: {success: true, message: "Access No: #{book_params[:access_no]} removed successfully"}, status: :ok and return
         else
-          render json: {success: false, message: "Access No: #{book_params[:access_no]} not Found"}, status: :not_found and return
+          render json: {success: false, message: "Access No: #{book_params[:access_no]} not Found"}, status: :ok and return
         end
       end
       
