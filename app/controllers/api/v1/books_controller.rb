@@ -1,11 +1,11 @@
 module Api
   module V1
     class BooksController < BaseController
-      extend Api::V1::AuthorUtils
+      include Api::V1::AuthorUtils
 
-      before_action :set_current_user, :except => [:index, :batch_create]
-      before_action :requires_login, :except => [:index, :batch_create]
-      before_action :check_role_for_authorization, :except => [:index, :batch_create]
+      before_action :set_current_user, :except => [:index]
+      before_action :requires_login, :except => [:index]
+      before_action :check_role_for_authorization, :except => [:index]
       before_action :type_cast_if_needed, :only => [:create, :update]
 
       def create
@@ -54,6 +54,7 @@ module Api
           begin
             book_update_params = book_update_params.merge(authors: authors) if authors.present?
             book = actual_book.update(book_update_params)
+            book_update_params[:authors] = book_update_params[:authors].map(&:author_name)
             render json: {success: true, message: "Book updated successfully", book: book_update_params} and return
           rescue => e
             render json: {success: false, message: e.message.split(': ')[1]}, status: :ok and return
