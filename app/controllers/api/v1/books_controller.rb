@@ -48,7 +48,7 @@ module Api
       end
 
       def update_book actual_book, authors = []
-        book_update_params = book_params.to_h
+        book_update_params = book_params
         is_valid = Book.check_for_valid_params actual_book, book_params.to_h
         if is_valid.keys.blank?
           begin
@@ -150,7 +150,7 @@ module Api
       end
 
       def type_cast_if_needed
-        params[:book][:availability] = params[:book][:availability].to_i
+        # params[:book][:availability] = params[:book][:availability].to_i
         params[:book][:cupboard_no] = params[:book][:cupboard_no].to_i
         params[:book][:shelf_no] = params[:book][:shelf_no].to_i
       end
