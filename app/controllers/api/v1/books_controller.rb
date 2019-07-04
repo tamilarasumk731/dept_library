@@ -141,10 +141,10 @@ module Api
         record = {:access_no => row[0],
                   :isbn => row[1],
                   :book_name => row[2],
-                  :availability => row[3],
-                  :cupboard_no => row[4],
-                  :shelf_no => row[5],
-                  :price => row[6],
+                  :availability => row[3].to_i,
+                  :cupboard_no => row[4].to_i,
+                  :shelf_no => row[5].to_i,
+                  :price => row[6].to_f,
                   :author => row[7],
                 }
       end
