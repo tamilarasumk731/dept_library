@@ -54,10 +54,10 @@ module Api
       end
 
       def staff_login
+        @user = User.find_by(staff_id: auth_params[:staff_id])
         if @user.role == "Librarian"
           librarian_login
         else
-          @user = User.find_by(staff_id: auth_params[:staff_id])
           if  @user && @user.authenticate(auth_params[:password]) && (@user.status == "Approved")
             @token = Token.encode(@user.id)
             @borrowed_book_count = borrowed_book_count @user
