@@ -36,7 +36,7 @@ module Api
 
       def set_current_user
         begin
-          token = request.headers['Authorization'].to_s
+          token = request.headers['Authorization'][15..-1].to_s
           return unless token
           payload = Token.new(token)
           @current_user = User.find(payload.user_id) if payload.valid?

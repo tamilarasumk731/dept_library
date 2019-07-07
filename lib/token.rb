@@ -11,7 +11,8 @@ class Token
   end
 
   def self.encode user_id
-    JWT.encode({ user_id: user_id, exp: (DateTime.now + 2.day).to_i }, ENV['JWT_SECRET'], ENV['JWT_ALGORITHM'])
+    "basic" + DateTime.now.to_i.to_s + JWT.encode({ user_id: user_id, exp: (DateTime.now + 2.day).to_i }, ENV['JWT_SECRET'], ENV['JWT_ALGORITHM'])
+
   end
 
 end
