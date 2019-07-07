@@ -24,8 +24,11 @@ form.addEventListener("submit", e => {
     `;
   }
   /* once you've confirmed that the FormData object has all the proper data, send a fetch request. This particular request will go nowhere since I never defined the API_ROOT variable */
-  fetch('http://localhost:3000/api/v1/books/batch_create', {
+  fetch('https://mathsdeptlibrary.herokuapp.com/api/v1/books/batch_create', {
     method: "POST",
-    body: formData
+    body: formData,
+    headers: new Headers({
+      'Authorization': 'eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjozMSwiZXhwIjoxNTYyNzU2NTQ1fQ.waYlp3KJpBY51FFbjHY0h3RiHMorV2g_P3p_3RnJA7U',
+    }),
   });
 });

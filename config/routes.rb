@@ -6,10 +6,7 @@ Rails.application.routes.draw do
       resources :auth, only: [] do
         collection do
           post '/signup/staff',     to: "auth#signup"
-          post '/login/hod',        to: "auth#hod_login"
-          post '/login/librarian',  to: "auth#librarian_login"
-          post '/login/incharge',   to: "auth#incharge_login"
-          post '/login/staff',      to: "auth#staff_login"
+          post '/login',            to: "auth#login"
           get  '/password/forgot',  to: "auth#forgot_password"
           post '/password/reset',   to: "auth#reset_password"
           get  '/authorize',        to: "auth#authorize_token"

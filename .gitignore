@@ -26,3 +26,5 @@
 .env.production
 config/environments/development.rb
 /pdf_generate/*
+upload.js
+upload.html
