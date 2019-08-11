@@ -3,9 +3,9 @@ module Api
     class BooksController < BaseController
       include Api::V1::AuthorUtils
 
-      before_action :set_current_user, :except => [:index]
-      before_action :requires_login, :except => [:index]
-      before_action :check_role_for_authorization, :except => [:index]
+      before_action :set_current_user, :except => [:index, :batch_create]
+      before_action :requires_login, :except => [:index, :batch_create]
+      before_action :check_role_for_authorization, :except => [:index, :batch_create]
       before_action :type_cast_if_needed, :only => [:create, :update]
 
       def create
@@ -85,7 +85,7 @@ module Api
         book_details = Array.new
         CSV.open("storage/book_files/#{filename}", "wb") do |csv|
           File.foreach(params["book"].tempfile) do |line|
-            book_details << [line.chomp]
+            book_details << CSV.parse_line(line.chomp)
             csv << [line.chomp]
           end
         end
@@ -115,7 +115,6 @@ module Api
         header_count = 0
         book_records = Array.new
         book_details.each_with_index do |row, i|
-          row = row[0].split(",")
           if i == 0
             header_count = row.count
             next
