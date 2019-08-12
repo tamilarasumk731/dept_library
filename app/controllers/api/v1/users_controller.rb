@@ -126,10 +126,41 @@ module Api
         @current_user
       end
 
+      def dashboard
+        @user = @current_user
+        if @user.role == 'HoD'
+          @staff_count = User.count
+          @book_count = Book.count
+          @issued_book_count = issued_book_count
+          @new_book_count = new_book_count
+        elsif @user.role == 'Librarian'
+          @staff_count = User.count
+          @book_count = Book.count
+          @issued_book_count = issued_book_count
+        elsif @user.role == 'Incharge'
+          @book_count = Book.count
+          @issued_book_count = issued_book_count
+        else
+          @borrowed_book_count = borrowed_book_count @user
+        end
+      end
+
       private
 
       def user_params
         params.require(:staff).permit( :name, :email, :desig, :salutation, :intercom, :password)
+      end
+
+      def issued_book_count
+        Transaction.where(status: "Approved").count
+      end
+
+      def new_book_count
+        Book.where.not(id: Transaction.all.map(&:book_id).uniq).count
+      end
+
+      def borrowed_book_count user
+        Transaction.where(user_id: user.id, status: true).count
       end
 
     end

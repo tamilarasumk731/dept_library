@@ -32,6 +32,7 @@ Rails.application.routes.draw do
           get  '/decline/staff',    to: "users#decline_staff"
           put  '/update/staff',     to: "users#update_profile"
           get  '/profile',          to: "users#user_info"
+          get  '/dashboard',        to: "users#dashboard"
         end
       end
 
